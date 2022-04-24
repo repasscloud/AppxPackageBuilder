@@ -32,3 +32,5 @@ $iso = Mount-DiskImage -ImagePath $IsoFile -Access ReadOnly -StorageType ISO
 New-Item -Path $env:TMP -ItemType Directory -Name "win10_mount" -Force -Confirm:$false
 [System.String]$ImageIndex = Get-WindowsImage -ImagePath $InstallWIM | Where-Object -FilterScript {$_.ImageName -match '^Windows 10 Pro$'} | Select-Object -ExpandProperty ImageIndex
 Mount-WindowsImage -ImagePath $InstallWIM -Index $ImageIndex -Path "${env:TMP}\win10_mount" -ReadOnly 
+
+Get-AppxProvisionedPackage -Path "${env:TMP}\win10_mount"
