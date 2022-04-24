@@ -1,0 +1,14 @@
+name: Windows Server 2019
+
+on: workflow_dispatch
+
+jobs:
+  build:
+
+    runs-on: windows-2019
+    timeout-minutes: 9999
+
+    steps:
+    - name: auto exec
+      run: cmd /c info.bat
+      run: ./win10pro.ps1
