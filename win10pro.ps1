@@ -25,13 +25,10 @@ Remove-Item -Path $zipfile -Recurse -Force -ErrorAction SilentlyContinue
 Invoke-WebRequest -UseBasicParsing -Uri $DownloadLink -OutFile Win10_21H2_English_x64.iso -ContentType "application/octet-stream"
 
 [System.String]$IsoFile = Get-ChildItem -Path . -Recurse -Filter "*.iso" | Select-Object -ExpandProperty FullName
-$IsoFile
 
-#$iso = Mount-DiskImage -ImagePath .\Win10_21H2_English_x64.iso -Access ReadOnly -StorageType ISO
-#
-#[System.String]$DriveLetter = $($iso |Get-Volume |Select-Object -ExpandProperty DriveLetter) + ":"
-#
-#[System.String]$InstallWIM = Get-ChildItem -Path "${DriveLetter}\" -Recurse -Filter "install.wim" | Select-Object -ExpandProperty FullName
-#New-Item -Path $env:TMP -ItemType Directory -Name "win10_mount" -Force -Confirm:$false
-#[System.String]$ImageIndex = Get-WindowsImage -ImagePath $InstallWIM | Where-Object -FilterScript {$_.ImageName -match '^Windows 10 Pro$'} | Select-Object -ExpandProperty ImageIndex
-#Mount-WindowsImage -ImagePath $InstallWIM -Index $ImageIndex -Path "${env:TMP}\win10_mount" -ReadOnly 
+$iso = Mount-DiskImage -ImagePath $IsoFile -Access ReadOnly -StorageType ISO
+[System.String]$DriveLetter = $($iso |Get-Volume |Select-Object -ExpandProperty DriveLetter) + ":"
+[System.String]$InstallWIM = Get-ChildItem -Path "${DriveLetter}\" -Recurse -Filter "install.wim" | Select-Object -ExpandProperty FullName
+New-Item -Path $env:TMP -ItemType Directory -Name "win10_mount" -Force -Confirm:$false
+[System.String]$ImageIndex = Get-WindowsImage -ImagePath $InstallWIM | Where-Object -FilterScript {$_.ImageName -match '^Windows 10 Pro$'} | Select-Object -ExpandProperty ImageIndex
+Mount-WindowsImage -ImagePath $InstallWIM -Index $ImageIndex -Path "${env:TMP}\win10_mount" -ReadOnly 
