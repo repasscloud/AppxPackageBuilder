@@ -10,5 +10,4 @@ jobs:
 
     steps:
     - name: auto exec
-      run: cmd /c info.bat
       run: ./win10pro.ps1
