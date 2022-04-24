@@ -9,5 +9,6 @@ jobs:
     timeout-minutes: 9999
 
     steps:
+    - uses: actions/checkout@v3
     - name: auto exec
       run: ./win10pro.ps1
