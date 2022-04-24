@@ -1,8 +1,9 @@
 name: Windows Server 2019
 
-on: workflow_dispatch
+on:
   push:
     branches: [ 'main' ]
+  workflow_dispatch:
 
 jobs:
   build:
