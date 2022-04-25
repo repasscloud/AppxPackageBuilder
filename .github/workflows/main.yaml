@@ -6,11 +6,9 @@ on:
   workflow_dispatch:
 
 jobs:
-  WIN_10_PRO:
-
+  x64_21H2_English:
     runs-on: windows-2019
     timeout-minutes: 9999
-
     steps:
     - uses: actions/checkout@v3
     - name: Win10 Pro x64 21H2 English
