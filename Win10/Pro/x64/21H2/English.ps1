@@ -46,7 +46,7 @@ Get-AppxProvisionedPackage -Path "${env:TMP}\Win${WinRelease}_${FidoRelease}_${W
     {
         Invoke-RestMethod -Uri "${env:API_URI}/v1/AppXProvisionedPackage/displayname/${DisplayName}" -Method Get -Headers $CHeaders -ErrorAction Stop
 
-        $RecordFound = Invoke-RestMethod -Uri "${env:API_URI}/v1/AppXProvisionedPackage/displayname/${DisplayName}" -Method Get -Headers $CHeaders -ErrorAction Stop
+        $RecordFound = Invoke-RestMethod -Uri "${env:API_URI}/v1/AppXProvisionedPackage/displayname/${DisplayName}" -Method Get -Headers $CHeaders
         [System.Int64]$Id = $RecordFound.id
 
         if ($RecordFound.lcid -notcontains $WinLcid)
