@@ -55,10 +55,10 @@ Get-AppxProvisionedPackage -Path "${env:TMP}\Win${WinRelease}_${FidoRelease}_${W
                 id = $Id
                 uuid = $RecordFound.uuid
                 displayName = $RecordFound.displayName
-                arch = $RecordFound.arch
+                arch = @($RecordFound.arch)
                 lcid = @($RecordFound.lcid,$WinLcid)
-                supportedWindowsEditions = $RecordFound.supportedWindowsEditions
-                supportedWindowsReleases = $RecordFound.supportedWindowsReleases
+                supportedWindowsEditions = @($RecordFound.supportedWindowsEditions)
+                supportedWindowsReleases = @($RecordFound.supportedWindowsReleases)
             } | ConvertTo-Json
             $Body
             Invoke-RestMethod -Uri "${env:API_URI}/v1/AppXProvisionedPackage/${Id}" -Method Put -UseBasicParsing -Body $Body -ContentType "application/json" -ErrorAction Stop
