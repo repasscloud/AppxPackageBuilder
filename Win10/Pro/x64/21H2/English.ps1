@@ -41,7 +41,32 @@ Get-AppxProvisionedPackage -Path "${env:TMP}\Win${WinRelease}_${FidoRelease}_${W
     $obj = $_
     [System.String]$DisplayName = $obj.DisplayName
     try {
-        Invoke-RestMethod -Uri "${env:API_URI}/v1/AppXProvisionedPackage/displayname/${DisplayName}" -Method Get -Headers $CHeaders -ErrorAction Stop 
+        #Invoke-RestMethod -Uri "${env:API_URI}/v1/AppXProvisionedPackage/displayname/${DisplayName}" -Method Get -Headers $CHeaders -ErrorAction Stop
+        $RecordFound = Invoke-RestMethod -Uri "${env:API_URI}/v1/AppXProvisionedPackage/displayname/${DisplayName}" -Method Get -Headers $CHeaders -ErrorAction Stop
+
+        [System.Int64]$Id = $RecordFound.id
+        if ($RecordFound.supportedWindowsEditions -notcontains $WinEdition)
+        {
+            $Body = @{
+                id = $Id
+                uuid = $RecordFound.uuid
+                displayName = $RecordFound.displayName
+                supportedWindowsEditions = $RecordFound.supportedWindowsEditions + $WinEdition
+                supportedWindowsReleases = $RecordFound.supportedWindowsReleases
+            } | ConvertTo-Json
+            Invoke-RestMethod -Uri "${env:API_URI}/v1/AppXProvisionedPackage/${Id}" -Method Put -UseBasicParsing -Body $Body -ContentType "application/json" -ErrorAction Stop
+        }
+        if ($RecordFound.supportedWindowsReleases -notcontains $SupportedWinRelease)
+        {
+            $Body = @{
+                id = $Id
+                uuid = $RecordFound.uuid
+                displayName = $RecordFound.displayName
+                supportedWindowsEditions = $RecordFound.supportedWindowsEditions
+                supportedWindowsReleases = $RecordFound.supportedWindowsReleases + $SupportedWinRelease
+            } | ConvertTo-Json
+            Invoke-RestMethod -Uri "${env:API_URI}/v1/AppXProvisionedPackage/${Id}" -Method Put -UseBasicParsing -Body $Body -ContentType "application/json" -ErrorAction Stop
+        }
     }
     catch {
         $Body = @{
