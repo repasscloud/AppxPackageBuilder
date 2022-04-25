@@ -15,3 +15,36 @@ jobs:
       run: ./Win10/Pro/x64/21H2/English.ps1
       env:
         API_URI: ${{ secrets.API_DEV_URL }}
+
+  x64_21H2_International:
+    runs-on: windows-2019
+    timeout-minutes: 9999
+    steps:
+    - uses: actions/checkout@v3
+    - name: Win10 Pro x64 21H2 International
+      run: ./Win10/Pro/x64/21H2/International.ps1
+      env:
+        API_URI: ${{ secrets.API_DEV_URL }}
+
+  x64_21H2_Arabic:
+    runs-on: windows-2019
+    timeout-minutes: 9999
+    steps:
+    - uses: actions/checkout@v3
+    - name: Win10 Pro x64 21H2 Arabic
+      run: ./Win10/Pro/x64/21H2/Arabic.ps1
+      env:
+        API_URI: ${{ secrets.API_DEV_URL }}
+
+  x64_21H2_Croatian:
+    runs-on: windows-2019
+    timeout-minutes: 9999
+    steps:
+    - uses: actions/checkout@v3
+    - name: Win10 Pro x64 21H2 Croatian
+      run: ./Win10/Pro/x64/21H2/Croatian.ps1
+      env:
+        API_URI: ${{ secrets.API_DEV_URL }}
+
+
+
