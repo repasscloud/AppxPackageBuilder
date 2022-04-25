@@ -38,78 +38,86 @@ Mount-WindowsImage -ImagePath $InstallWIM -Index $ImageIndex -Path "${env:TMP}\W
 
 <# MAIN API EXEC #>
 Get-AppxProvisionedPackage -Path "${env:TMP}\Win${WinRelease}_${FidoRelease}_${WinLcid}_${WinArch}_MOUNT" | ForEach-Object {
+    
     $obj = $_
+    
     [System.String]$DisplayName = $obj.DisplayName
-    try {
-        #Invoke-RestMethod -Uri "${env:API_URI}/v1/AppXProvisionedPackage/displayname/${DisplayName}" -Method Get -Headers $CHeaders -ErrorAction Stop
-        $RecordFound = Invoke-RestMethod -Uri "${env:API_URI}/v1/AppXProvisionedPackage/displayname/${DisplayName}" -Method Get -Headers $CHeaders -ErrorAction Stop
+    Write-Output "Verifying AppxProvisionedPackage: ${DisplayName}"
+    
+    try
+    {
+        Invoke-RestMethod -Uri "${env:API_URI}/v1/AppXProvisionedPackage/displayname/${DisplayName}" -Method Get -Headers $CHeaders -ErrorAction Stop
 
+        $RecordFound = Invoke-RestMethod -Uri "${env:API_URI}/v1/AppXProvisionedPackage/displayname/${DisplayName}" -Method Get -Headers $CHeaders
         [System.Int64]$Id = $RecordFound.id
 
+        <# ARCH #>
         if ($RecordFound.arch -notcontains $WinArch)
         {
             $Body = @{
                 id = $Id
                 uuid = $RecordFound.uuid
                 displayName = $RecordFound.displayName
-                arch = $RecordFound.arch + $WinArch
-                lcid = $RecordFound.lcid
-                supportedWindowsEditions = $RecordFound.supportedWindowsEditions
-                supportedWindowsReleases = $RecordFound.supportedWindowsReleases
+                arch = @($RecordFound.arch,$WinArch)
+                lcid = @($RecordFound.lcid)
+                supportedWindowsEditions = @($RecordFound.supportedWindowsEditions)
+                supportedWindowsReleases = @($RecordFound.supportedWindowsReleases)
             } | ConvertTo-Json
+            $Body
             Invoke-RestMethod -Uri "${env:API_URI}/v1/AppXProvisionedPackage/${Id}" -Method Put -UseBasicParsing -Body $Body -ContentType "application/json" -ErrorAction Stop
         }
+
+        <# LCID #>
         if ($RecordFound.lcid -notcontains $WinLcid)
         {
             $Body = @{
                 id = $Id
                 uuid = $RecordFound.uuid
                 displayName = $RecordFound.displayName
-                arch = $RecordFound.arch
-                lcid = $RecordFound.lcid + $WinLcid
-                supportedWindowsEditions = $RecordFound.supportedWindowsEditions
-                supportedWindowsReleases = $RecordFound.supportedWindowsReleases
+                arch = @($RecordFound.arch)
+                lcid = @($RecordFound.lcid,$WinLcid)
+                supportedWindowsEditions = @($RecordFound.supportedWindowsEditions)
+                supportedWindowsReleases = @($RecordFound.supportedWindowsReleases)
             } | ConvertTo-Json
+            $Body
             Invoke-RestMethod -Uri "${env:API_URI}/v1/AppXProvisionedPackage/${Id}" -Method Put -UseBasicParsing -Body $Body -ContentType "application/json" -ErrorAction Stop
         }
+
+        <# SUPPORTEDWINDOWSEDITIONS #>
         if ($RecordFound.supportedWindowsEditions -notcontains $WinEdition)
         {
             $Body = @{
                 id = $Id
                 uuid = $RecordFound.uuid
                 displayName = $RecordFound.displayName
-                arch = $RecordFound.arch
-                lcid = $RecordFound.lcid
-                supportedWindowsEditions = $RecordFound.supportedWindowsEditions + $WinEdition
-                supportedWindowsReleases = $RecordFound.supportedWindowsReleases
+                arch = @($RecordFound.arch)
+                lcid = @($RecordFound.lcid)
+                supportedWindowsEditions = @($RecordFound.supportedWindowsEditions,$WinEdition)
+                supportedWindowsReleases = @($RecordFound.supportedWindowsReleases)
             } | ConvertTo-Json
+            $Body
             Invoke-RestMethod -Uri "${env:API_URI}/v1/AppXProvisionedPackage/${Id}" -Method Put -UseBasicParsing -Body $Body -ContentType "application/json" -ErrorAction Stop
         }
-        if ($RecordFound.supportedWindowsReleases -notcontains $SupportedWinRelease)
+
+        <# SUPPORTEDWINDOWSRELEASES #>
+        if ($RecordFound.supportedWindowsReleases -notcontains $WinEdition)
         {
             $Body = @{
                 id = $Id
                 uuid = $RecordFound.uuid
                 displayName = $RecordFound.displayName
-                arch = $RecordFound.arch
-                lcid = $RecordFound.lcid
-                supportedWindowsEditions = $RecordFound.supportedWindowsEditions
-                supportedWindowsReleases = $RecordFound.supportedWindowsReleases + $SupportedWinRelease
+                arch = @($RecordFound.arch)
+                lcid = @($RecordFound.lcid)
+                supportedWindowsEditions = @($RecordFound.supportedWindowsEditions)
+                supportedWindowsReleases = @($RecordFound.supportedWindowsReleases,$SupportedWinRelease)
             } | ConvertTo-Json
+            $Body
             Invoke-RestMethod -Uri "${env:API_URI}/v1/AppXProvisionedPackage/${Id}" -Method Put -UseBasicParsing -Body $Body -ContentType "application/json" -ErrorAction Stop
         }
     }
-    catch {
-        $Body = @{
-            id = 0
-            uuid = [System.Guid]::NewGuid().ToString()
-            displayName = $DisplayName
-            arch = @($WinArch)
-            lcid = @($WinLcid)
-            supportedWindowsEditions = @($WinEdition)
-            supportedWindowsReleases = @($SupportedWinRelease)
-        } | ConvertTo-Json
-        Invoke-RestMethod -Uri "${env:API_URI}/v1/AppXProvisionedPackage" -Method Post -UseBasicParsing -Body $Body -ContentType "application/json" -ErrorAction Stop
+    catch
+    {
+        Write-Output "Not found in API: ${DisplayName}"
     }
 }
 
