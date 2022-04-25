@@ -45,6 +45,24 @@ Get-AppxProvisionedPackage -Path "${env:TMP}\Win${WinRelease}_${FidoRelease}_${W
     try
     {
         Invoke-RestMethod -Uri "${env:API_URI}/v1/AppXProvisionedPackage/displayname/${DisplayName}" -Method Get -Headers $CHeaders -ErrorAction Stop
+
+        $RecordFound = Invoke-RestMethod -Uri "${env:API_URI}/v1/AppXProvisionedPackage/displayname/${DisplayName}" -Method Get -Headers $CHeaders -ErrorAction Stop
+        [System.Int64]$Id = $RecordFound.id
+
+        if ($RecordFound.lcid -notcontains $WinLcid)
+        {
+            $Body = @{
+                id = $Id
+                uuid = $RecordFound.uuid
+                displayName = $RecordFound.displayName
+                arch = $RecordFound.arch
+                lcid = @($RecordFound.lcid,$WinLcid)
+                supportedWindowsEditions = $RecordFound.supportedWindowsEditions
+                supportedWindowsReleases = $RecordFound.supportedWindowsReleases
+            } | ConvertTo-Json
+            $Body
+            Invoke-RestMethod -Uri "${env:API_URI}/v1/AppXProvisionedPackage/${Id}" -Method Put -UseBasicParsing -Body $Body -ContentType "application/json" -ErrorAction Stop
+        }
     }
     catch
     {
