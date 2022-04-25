@@ -1,4 +1,4 @@
-name: AppXPackages WIN10 PRO
+name: WIN10 PRO
 
 on:
   push:
