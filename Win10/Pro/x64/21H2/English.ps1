@@ -40,6 +40,7 @@ Mount-WindowsImage -ImagePath $InstallWIM -Index $ImageIndex -Path "${env:TMP}\W
 Get-AppxProvisionedPackage -Path "${env:TMP}\Win${WinRelease}_${FidoRelease}_${WinLcid}_${WinArch}_MOUNT" | ForEach-Object {
     $obj = $_
     [System.String]$DisplayName = $obj.DisplayName
+    Write-Output "Verifying AppxProvisionedPackage: ${DisplayName}"
     try
     {
         $RecordFound = Invoke-RestMethod -Uri "${env:API_URI}/v1/AppXProvisionedPackage/displayname/${DisplayName}" -Method Get -Headers $CHeaders -ErrorAction Stop
@@ -109,6 +110,9 @@ Get-AppxProvisionedPackage -Path "${env:TMP}\Win${WinRelease}_${FidoRelease}_${W
             supportedWindowsEditions = @($WinEdition)
             supportedWindowsReleases = @($SupportedWinRelease)
         } | ConvertTo-Json
+
+        $Body
+
         Invoke-RestMethod -Uri "${env:API_URI}/v1/AppXProvisionedPackage" -Method Post -UseBasicParsing -Body $Body -ContentType "application/json" -ErrorAction Stop
     }
 }
