@@ -17,10 +17,11 @@ $CHeaders = @{accept = 'text/json'}
 
 <# CONFIG #>
 [System.String]$WinRelease = "10"
-[System.String]$WinEdition = "PRO"
+[System.String]$WinEdition = "Pro"
 [System.String]$WinArch = "x64"
 [System.String]$FidoRelease = "21H2"
 [System.String]$WinLcid = "English"
+[System.String]$SupportedWinRelease = "Windows_10"
 
 <# SETUP #>
 [System.String]$DownloadLink = & $FidoFile -Win $WinRelease -Rel $FidoRelease -Ed $WinEdition -Lang $WinLcid -Arch $WinArch -GetUrl
@@ -40,10 +41,17 @@ Get-AppxProvisionedPackage -Path "${env:TMP}\Win${WinRelease}_${FidoRelease}_${W
     $obj = $_
     [System.String]$DisplayName = $obj.DisplayName
     try {
-        Invoke-RestMethod -Uri "https://engine.api.dev.optechx-data.com/v1/AppXProvisionedPackage/displayname/${DisplayName}" -Method Get -Headers $CHeaders -ErrorAction Stop 
+        Invoke-RestMethod -Uri "${env:API_URI}/v1/AppXProvisionedPackage/displayname/${DisplayName}" -Method Get -Headers $CHeaders -ErrorAction Stop 
     }
     catch {
-        "NOT FOUND: ${DisplayName}"
+        $Body = @{
+            id = 0
+            uuid = [System.Guid]::NewGuid().ToString()
+            displayName = $DisplayName
+            supportedWindowsEditions = @($WinEdition)
+            supportedWindowsReleases = @($SupportedWinRelease)
+        } | ConvertTo-Json
+        Invoke-RestMethod -Uri "${env:API_URI}/v1/AppXProvisionedPackage" -Method Post -UseBasicParsing -Body $Body -ContentType "application/json" -ErrorAction Stop
     }
 }
 
