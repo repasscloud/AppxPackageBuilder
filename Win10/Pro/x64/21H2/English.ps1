@@ -40,8 +40,8 @@ Mount-WindowsImage -ImagePath $InstallWIM -Index $ImageIndex -Path "${env:TMP}\W
 Get-AppxProvisionedPackage -Path "${env:TMP}\Win${WinRelease}_${FidoRelease}_${WinLcid}_${WinArch}_MOUNT" | ForEach-Object {
     $obj = $_
     [System.String]$DisplayName = $obj.DisplayName
-    try {
-        #Invoke-RestMethod -Uri "${env:API_URI}/v1/AppXProvisionedPackage/displayname/${DisplayName}" -Method Get -Headers $CHeaders -ErrorAction Stop
+    try
+    {
         $RecordFound = Invoke-RestMethod -Uri "${env:API_URI}/v1/AppXProvisionedPackage/displayname/${DisplayName}" -Method Get -Headers $CHeaders -ErrorAction Stop
 
         [System.Int64]$Id = $RecordFound.id
@@ -52,7 +52,7 @@ Get-AppxProvisionedPackage -Path "${env:TMP}\Win${WinRelease}_${FidoRelease}_${W
                 id = $Id
                 uuid = $RecordFound.uuid
                 displayName = $RecordFound.displayName
-                arch = $RecordFound.arch + $WinArch
+                arch = @($RecordFound.arch,$WinArch)
                 lcid = $RecordFound.lcid
                 supportedWindowsEditions = $RecordFound.supportedWindowsEditions
                 supportedWindowsReleases = $RecordFound.supportedWindowsReleases
@@ -66,7 +66,7 @@ Get-AppxProvisionedPackage -Path "${env:TMP}\Win${WinRelease}_${FidoRelease}_${W
                 uuid = $RecordFound.uuid
                 displayName = $RecordFound.displayName
                 arch = $RecordFound.arch
-                lcid = $RecordFound.lcid + $WinLcid
+                lcid = @($RecordFound.lcid,$WinLcid)
                 supportedWindowsEditions = $RecordFound.supportedWindowsEditions
                 supportedWindowsReleases = $RecordFound.supportedWindowsReleases
             } | ConvertTo-Json
