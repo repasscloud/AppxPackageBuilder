@@ -1,4 +1,4 @@
-name: Windows Server 2019
+name: AppXPackages WIN10 PRO
 
 on:
   push:
@@ -6,12 +6,12 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  WIN_10_PRO:
 
     runs-on: windows-2019
     timeout-minutes: 9999
 
     steps:
     - uses: actions/checkout@v3
-    - name: auto exec
-      run: ./win10pro.ps1
+    - name: Win10 Pro x64 21H2 English
+      run: ./Win10/Pro/x64/21H2/English.ps1
