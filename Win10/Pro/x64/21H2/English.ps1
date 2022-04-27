@@ -61,11 +61,12 @@ Get-AppxProvisionedPackage -Path "${env:TMP}\Win${WinRelease}_${FidoRelease}_${W
                 displayName = $RecordFound.displayName
                 arch = $newArray
                 lcid = @($RecordFound.lcid)
+                supportedWindowsVersions = @($RecordFound.supportedWindowsVersions)
                 supportedWindowsEditions = @($RecordFound.supportedWindowsEditions)
                 supportedWindowsReleases = @($RecordFound.supportedWindowsReleases)
             } | ConvertTo-Json
             Write-Output "<| Test WinArch"
-            Invoke-RestMethod -Uri "${env:API_URI}/v1/AppXProvisionedPackage/${Id}" -Method Put -UseBasicParsing -Body $Body -ContentType "application/json" -ErrorAction Stop
+            Invoke-RestMethod -Uri "${env:API_URI}/v1/AppXProvisionedPackage/${Id}" -Method Put -UseBasicParsing -Body $Body -ContentType 'application/json' -ErrorAction Stop
         }
         else
         {
@@ -82,15 +83,38 @@ Get-AppxProvisionedPackage -Path "${env:TMP}\Win${WinRelease}_${FidoRelease}_${W
                 displayName = $RecordFound.displayName
                 arch = @($RecordFound.arch)
                 lcid = $newArray
+                supportedWindowsVersions = @($RecordFound.supportedWindowsVersions)
                 supportedWindowsEditions = @($RecordFound.supportedWindowsEditions)
                 supportedWindowsReleases = @($RecordFound.supportedWindowsReleases)
             } | ConvertTo-Json
             Write-Output "<| Test Lcid"
-            Invoke-RestMethod -Uri "${env:API_URI}/v1/AppXProvisionedPackage/${Id}" -Method Put -UseBasicParsing -Body $Body -ContentType "application/json" -ErrorAction Stop
+            Invoke-RestMethod -Uri "${env:API_URI}/v1/AppXProvisionedPackage/${Id}" -Method Put -UseBasicParsing -Body $Body -ContentType 'application/json' -ErrorAction Stop
         }
         else
         {
             Write-Output "  => Lcid OK"
+        }
+
+        <# SUPPORTEDWINDOWSVERSIONS #>
+        if (@($RecordFound.supportedWindowsVersions) -notcontains $FidoRelease)
+        {
+            $newArray = @($RecordFound.supportedWindowsVersions) + $FidoRelease
+            $Body = @{
+                id = $Id
+                uuid = $RecordFound.uuid
+                displayName = $RecordFound.displayName
+                arch = @($RecordFound.arch)
+                lcid = @($RecordFound.lcid)
+                supportedWindowsVersions = $newArray
+                supportedWindowsEditions = @($RecordFound.supportedWindowsEditions)
+                supportedWindowsReleases = @($RecordFound.supportedWindowsReleases)
+            } | ConvertTo-Json
+            Write-Output "<| Test SupportedWindowsVersions"
+            Invoke-RestMethod -Uri "${env:API_URI}/v1/AppXProvisionedPackage/${Id}" -Method Put -UseBasicParsing -Body $Body -ContentType 'application/json' -ErrorAction Stop
+        }
+        else
+        {
+            Write-Output "  => SupportedWindowsVersions OK"
         }
 
         <# SUPPORTEDWINDOWSEDITIONS #>
@@ -103,11 +127,12 @@ Get-AppxProvisionedPackage -Path "${env:TMP}\Win${WinRelease}_${FidoRelease}_${W
                 displayName = $RecordFound.displayName
                 arch = @($RecordFound.arch)
                 lcid = @($RecordFound.lcid)
+                supportedWindowsVersions = @($RecordFound.supportedWindowsVersions)
                 supportedWindowsEditions = $newArray
                 supportedWindowsReleases = @($RecordFound.supportedWindowsReleases)
             } | ConvertTo-Json
             Write-Output "<| Test SupportedWindowsEditions"
-            Invoke-RestMethod -Uri "${env:API_URI}/v1/AppXProvisionedPackage/${Id}" -Method Put -UseBasicParsing -Body $Body -ContentType "application/json" -ErrorAction Stop
+            Invoke-RestMethod -Uri "${env:API_URI}/v1/AppXProvisionedPackage/${Id}" -Method Put -UseBasicParsing -Body $Body -ContentType 'application/json' -ErrorAction Stop
         }
         else
         {
@@ -124,11 +149,12 @@ Get-AppxProvisionedPackage -Path "${env:TMP}\Win${WinRelease}_${FidoRelease}_${W
                 displayName = $RecordFound.displayName
                 arch = @($RecordFound.arch)
                 lcid = @($RecordFound.lcid)
+                supportedWindowsVersions = @($RecordFound.supportedWindowsVersions)
                 supportedWindowsEditions = @($RecordFound.supportedWindowsEditions)
                 supportedWindowsReleases = $newArray
             } | ConvertTo-Json
             Write-output "<| Test SupportedWindowsReleases"
-            Invoke-RestMethod -Uri "${env:API_URI}/v1/AppXProvisionedPackage/${Id}" -Method Put -UseBasicParsing -Body $Body -ContentType "application/json" -ErrorAction Stop
+            Invoke-RestMethod -Uri "${env:API_URI}/v1/AppXProvisionedPackage/${Id}" -Method Put -UseBasicParsing -Body $Body -ContentType 'application/json' -ErrorAction Stop
         }
         else
         {
@@ -137,7 +163,17 @@ Get-AppxProvisionedPackage -Path "${env:TMP}\Win${WinRelease}_${FidoRelease}_${W
     }
     catch
     {
-        Write-Output "=================> Not found in API: ${DisplayName}"
+        $Body = @{
+            id = 0
+            uuid = [System.Guid]::NewGuid().Guid.ToString()
+            displayName = $DisplayName
+            arch = @($WinArch)
+            lcid = @($WinLcid)
+            supportedWindowsVersions = @($newArray)
+            supportedWindowsEditions = @($WinEdition)
+            supportedWindowsReleases = @($SupportedWinRelease)
+        } | ConvertTo-Json
+        Invoke-RestMethod -Uri "${env:API_URI}/v1/AppXProvisionedPackage" -Method Post -UseBasicParsing -Body $Body -ContentType 'application/json' -ErrorAction Stop
     }
     
 }
