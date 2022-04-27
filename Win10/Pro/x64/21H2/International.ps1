@@ -54,11 +54,12 @@ Get-AppxProvisionedPackage -Path "${env:TMP}\Win${WinRelease}_${FidoRelease}_${W
         <# ARCH #>
         if (@($RecordFound.arch) -notcontains $WinArch)
         {
+            $newArray = @($RecordFound.arch) + $WinArch
             $Body = @{
                 id = $Id
                 uuid = $RecordFound.uuid
                 displayName = $RecordFound.displayName
-                arch = @($RecordFound.arch,$WinArch)
+                arch = $newArray
                 lcid = @($RecordFound.lcid)
                 supportedWindowsEditions = @($RecordFound.supportedWindowsEditions)
                 supportedWindowsReleases = @($RecordFound.supportedWindowsReleases)
@@ -74,12 +75,13 @@ Get-AppxProvisionedPackage -Path "${env:TMP}\Win${WinRelease}_${FidoRelease}_${W
         <# LCID #>
         if (@($RecordFound.lcid) -notcontains $WinLcid)
         {
+            $newArray = @($RecordFound.lcid) + $WinLcid
             $Body = @{
                 id = $Id
                 uuid = $RecordFound.uuid
                 displayName = $RecordFound.displayName
                 arch = @($RecordFound.arch)
-                lcid = @($RecordFound.lcid,$WinLcid)
+                lcid = $newArray
                 supportedWindowsEditions = @($RecordFound.supportedWindowsEditions)
                 supportedWindowsReleases = @($RecordFound.supportedWindowsReleases)
             } | ConvertTo-Json
@@ -94,13 +96,14 @@ Get-AppxProvisionedPackage -Path "${env:TMP}\Win${WinRelease}_${FidoRelease}_${W
         <# SUPPORTEDWINDOWSEDITIONS #>
         if (@($RecordFound.supportedWindowsEditions) -notcontains $WinEdition)
         {
+            $newArray = @($RecordFound.supportedWindowsEditions) + $WinEdition
             $Body = @{
                 id = $Id
                 uuid = $RecordFound.uuid
                 displayName = $RecordFound.displayName
                 arch = @($RecordFound.arch)
                 lcid = @($RecordFound.lcid)
-                supportedWindowsEditions = @($RecordFound.supportedWindowsEditions,$WinEdition)
+                supportedWindowsEditions = $newArray
                 supportedWindowsReleases = @($RecordFound.supportedWindowsReleases)
             } | ConvertTo-Json
             Write-Output "<| Test SupportedWindowsEditions"
@@ -114,6 +117,7 @@ Get-AppxProvisionedPackage -Path "${env:TMP}\Win${WinRelease}_${FidoRelease}_${W
         <# SUPPORTEDWINDOWSRELEASES #>
         if (@($RecordFound.supportedWindowsReleases) -notcontains $SupportedWinRelease)
         {
+            $newArray = @($RecordFound.supportedWindowsReleases) + $SupportedWinRelease
             $Body = @{
                 id = $Id
                 uuid = $RecordFound.uuid
@@ -121,7 +125,7 @@ Get-AppxProvisionedPackage -Path "${env:TMP}\Win${WinRelease}_${FidoRelease}_${W
                 arch = @($RecordFound.arch)
                 lcid = @($RecordFound.lcid)
                 supportedWindowsEditions = @($RecordFound.supportedWindowsEditions)
-                supportedWindowsReleases = @($RecordFound.supportedWindowsReleases,$SupportedWinRelease)
+                supportedWindowsReleases = $newArray
             } | ConvertTo-Json
             Write-output "<| Test SupportedWindowsReleases"
             Invoke-RestMethod -Uri "${env:API_URI}/v1/AppXProvisionedPackage/${Id}" -Method Put -UseBasicParsing -Body $Body -ContentType "application/json" -ErrorAction Stop
