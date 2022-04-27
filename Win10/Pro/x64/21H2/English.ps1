@@ -169,7 +169,7 @@ Get-AppxProvisionedPackage -Path "${env:TMP}\Win${WinRelease}_${FidoRelease}_${W
             displayName = $DisplayName
             arch = @($WinArch)
             lcid = @($WinLcid)
-            supportedWindowsVersions = @($newArray)
+            supportedWindowsVersions = @($FidoRelease)
             supportedWindowsEditions = @($WinEdition)
             supportedWindowsReleases = @($SupportedWinRelease)
         } | ConvertTo-Json
