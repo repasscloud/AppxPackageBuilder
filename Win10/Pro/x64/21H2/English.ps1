@@ -175,7 +175,6 @@ Get-AppxProvisionedPackage -Path "${env:TMP}\Win${WinRelease}_${FidoRelease}_${W
         } | ConvertTo-Json
         Invoke-RestMethod -Uri "${env:API_URI}/v1/AppXProvisionedPackage" -Method Post -UseBasicParsing -Body $Body -ContentType 'application/json' -ErrorAction Stop
     }
-    
 }
 
 <# CLEAN UP #>
