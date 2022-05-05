@@ -21,7 +21,7 @@ $CHeaders = @{accept = 'application/json'}
 [System.String]$WinArch = "x64"
 [System.String]$FidoRelease = "21H2"
 [System.String]$WinLcid = "English"
-[System.String]$SupportedWinRelease = "Windows_10"
+[System.String]$SupportedWinRelease = "Windows ${WinRelease}"
 
 <# SETUP #>
 [System.String]$DownloadLink = & $FidoFile -Win $WinRelease -Rel $FidoRelease -Ed $WinEdition -Lang $WinLcid -Arch $WinArch -GetUrl
