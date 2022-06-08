@@ -1,7 +1,7 @@
 name: WIN10 PRO
 
 on:
-  push:
+  pull_request:
     branches: [ 'main' ]
   workflow_dispatch:
 
